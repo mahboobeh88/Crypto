@@ -1,1 +1,2 @@
-﻿namespace Crypto.Domain.Entities {     public class QuoteResult     {         public required string CryptoCurrencyName { get; set; }         public required Dictionary<string, decimal> Quotes { get; set; }     } } 
+﻿namespace Crypto.Domain.Entities {     public class QuoteResult     {         public required string CryptoCurrencyName { get; set; }
+        public required Dictionary<string, decimal> Quotes { get; set; }     } } 

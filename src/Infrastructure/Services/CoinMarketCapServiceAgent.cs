@@ -1,50 +1,53 @@
-﻿using Crypto.Application.IContracts;
+﻿using System.Text.Json;
+using Crypto.Application.IContracts;
+using Crypto.Infrastructure.Models;
 using Microsoft.Extensions.Configuration;
-using System.Text.Json;
+using Microsoft.Extensions.Options;
+using Crypto.Infrastructure.Common;
 
 namespace Crypto.Infrastructure.Services;
-public class CoinMarketCapServiceAgent:ICoinMarketCapServiceAgent
+public class CoinMarketCapServiceAgent : ICoinMarketCapServiceAgent
 {
     private readonly HttpClient _httpClient;
-    private readonly IConfiguration _config;
-    private readonly string _baseUrl;
 
-    public CoinMarketCapServiceAgent(HttpClient httpClient, IConfiguration config)
+    private readonly ExternalServicesSetting _settings;
+    
+   
+    public CoinMarketCapServiceAgent(HttpClient httpClient, IOptions<ExternalServicesSetting> settings)
     {
         _httpClient = httpClient;
-        _config = config;
-        _baseUrl = _config["CoinMarketCapBaseUrl"]??throw new Exception("CoinMarketCap url not found");
+        _settings = settings.Value;
+       
     }
 
     public async Task<decimal?> GetEurPriceAsync(string symbol)
     {
-        try
-        {
-            _httpClient.DefaultRequestHeaders.Clear();
-            _httpClient.DefaultRequestHeaders.Add("X-CMC_PRO_API_KEY", _config["CoinMarketCapApiKey"]);
+        _httpClient.DefaultRequestHeaders.Clear();
+        _httpClient.DefaultRequestHeaders.Add("X-CMC_PRO_API_KEY", _settings.CoinMarketCapApi.Key);
 
-            var response = await _httpClient.GetAsync($"{_baseUrl}/cryptocurrency/quotes/latest?symbol={symbol}&convert=EUR");
+        var response = await _httpClient.GetAsync($"{_settings.CoinMarketCapApi.BaseUrl}/cryptocurrency/quotes/latest?symbol={symbol}&convert=EUR");
 
-            if (!response.IsSuccessStatusCode)
-                throw new HttpRequestException($"Failed to fetch eurPrice: {response.StatusCode} - {response}");
+        if (!response.IsSuccessStatusCode)
+            throw new HttpRequestException($"Failed to fetch eurPrice: {response.StatusCode} - {response}");
 
-            var content = await response.Content.ReadAsStringAsync();
-            var json = JsonDocument.Parse(content);
-            return json.RootElement
-                .GetProperty("data")
-                .GetProperty(symbol.ToUpper())
-                .GetProperty("quote")
-                .GetProperty("EUR")
-                .GetProperty("price")
-                .GetDecimal();
+        var content = await response.Content.ReadAsStringAsync();
+        var json = JsonDocument.Parse(content);
+      
 
-        }
-        catch (Exception ex)
-        {
-            var s = ex;
-            throw;
-        }
-       
+        return ExtractPrice(json, symbol);
+
+    }
+
+    private decimal ExtractPrice(JsonDocument json, string symbol)
+    {
+        var path = $"data.{symbol.ToUpper()}.quote.EUR.price";
+
+        var priceElement = json.RootElement.TryGetNestedProperty(path.Split('.'));
+        
+        if (priceElement.ValueKind == JsonValueKind.Null)
+            throw new ArgumentNullException("Price Value is Null");
+
+        return priceElement.GetDecimal();
     }
 }
 
