@@ -1,0 +1,64 @@
+# Answers to technical questions
+1. Completing the task took around 8 hours. I implemented the assignment fully and also added logging and exception handling middleware.
+    I believe it could be a good idea to expand the solution by adding additional APIs for example, an API to register phone numbers 
+    and configure an interval for sending the prices of the top ten cryptocurrencies as notifications. 
+    These notifications could be delivered using a Windows Service.
+
+2. C# 11  introduced useful feature called " Required members". this allows developers to mark certain properties as required ensuring 
+    they must be initialized during object creation.It helps prevent bugs related to uninitialized properties and improves code safety 
+    and clarity.
+    public class User
+    {
+         public required string Username { get; set; }
+         public required string Email { get; set; }
+    }
+
+
+    var user = new User
+    {
+      Username = "Ali",
+      Email = "ali@example.com"
+    };
+
+3. yes, i've had to deal with performance issues in production. My first step is usually to check the logs to see if there are any
+    errors, slow requests , or patterns. we also check the server metrics like CPU & memory usage.
+    
+4. The last technical book i was reading : C# 12 in a nutshell but it's going forward to slow.
+
+5. The task is well-defined and practical. It touches on real-world concepts and gives a good chance to demonstrate both coding and 
+    design skills.i liked that the task allows flexibility in implementation and leaves room for architectural decisions. 
+    It also reflects challenges that may happen in a real production environment.My focus would be on writing clean, maintainable code,
+    with separation of concerns and testable components. I would also consider performance and scalability depending on the nature of 
+    the use case.
+
+6. {
+  "name": "Mahboobeh Mohseni",
+  "age": 37,
+  "location": "Tehran, Iran",
+  "profession": ".NET Developer",
+  "experienceYears": 10,
+  "skills": [
+    "C#",
+    ".NET Core",
+    "Web API",
+    "SQL Server",
+    "Kafka",
+    "Clean Architecture",
+    "SOLID Principles",
+    "Design Patterns"
+  ],
+  "interests": [
+    "Learning new technologies",
+    "Working on backend systems",
+    "Building clean and maintainable code"
+  ],
+  "aboutMe": "I'm a software developer with over 10 years of experience in .NET technologies. I enjoy working on backend systems, solving performance problems, and improving code quality."
+}
+
+
+
+
+
+
+
+
